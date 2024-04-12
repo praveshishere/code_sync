@@ -9,13 +9,15 @@ create_backup() {
     local dest_branch=$1
     local current_branch=$(git rev-parse --abbrev-ref HEAD)
     local current_date=$(date +"%d_%B_%Y")
-    local backup_branch="temp_$dest_branch"
+    local backup_branch="$dest_branch-$current_date"
 
     # Fetch the latest changes from the remote destination branch
     git fetch origin $dest_branch
 
     # Create a temporary copy of the branch from origin/dest_branch
-    git checkout -b $backup_branch origin/$dest_branch
+    git checkout -b $backup_branch origin/$dest_branch --quiet
+
+    git push origin $backup_branch
 
     # Return the backup branch name
     echo $backup_branch
@@ -30,7 +32,7 @@ verify_backup() {
     git checkout $backup_branch
 
     # Compare the backup branch with the destination branch
-    if git diff --quiet $backup_branch $dest_branch; then
+    if git diff --quiet $backup_branch origin/$dest_branch; then
         echo "Backup branch $backup_branch is the same as $dest_branch"
         return 0  # Return true
     else
@@ -50,6 +52,7 @@ sync_branch() {
 
     # Checkout the source branch to a temporary branch
     git checkout -b $temp_source_branch origin/$source_branch
+    echo "Temporary copy of branch created: $dest_branch"
 
     # Fetch the latest changes from the remote destination branch
     git fetch origin $dest_branch
@@ -62,17 +65,18 @@ sync_branch() {
 
     # Commit the changes with the commit message
     git commit -m "$dest_branch config added"
+    echo "Config added"
 
     # Delete the local destination branch
     git branch -D $dest_branch
 
     # Checkout from the temporary branch with the same name as destination branch
-    git checkout -b $dest_branch origin/$dest_branch
+    git checkout -b $dest_branch
+
+    echo "Force pushed $dest_branch to remote"
 
     # Force push the destination branch to the remote repository
     git push -f origin $dest_branch
-
-    echo "Temporary copy of branch created: $dest_branch"
 }
 
 # Check if both source and destination branches are provided
