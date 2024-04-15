@@ -1,0 +1,1 @@
+ssh://APKARXD2U7YBBPD6KDPQ@git-codecommit.ap-south-1.amazonaws.com/v1/repos/

@@ -61,7 +61,7 @@ sync_branch() {
     git checkout origin/$dest_branch .env .env.local buildspec.yml nginx.conf Dockerfile
 
     # Add the changes
-    git add .env .env.local buildspec.yml nginx.conf Dockerfile
+    git add .env .env.local buildspec.yml nginx.conf Dockerfile src/common/API_Config.js
 
     # Commit the changes with the commit message
     git commit -m "$dest_branch config added"
